@@ -13,26 +13,37 @@ class MasterItemsController extends Controller
     }
 
     public function search(Request $request)
-    {
-        $kode = $request->kode;
-        $nama = $request->nama;
-        $hargamin = $request->hargamin;
-        $hargamax = $request->hargamax;
+{
+    $kode = $request->kode;
+    $nama = $request->nama;
+    $hargamin = $request->hargamin;
+    $hargamax = $request->hargamax;
 
-        $data_search = MasterItem::query();
+    $data_search = MasterItem::with('kategoriItems') // relasi many to many kategori
+        ->select('kode', 'nama', 'foto', 'jenis', 'harga_beli', 'laba', 'supplier');
 
-        if (!empty($kode)) $data_search = $data_search->where('kode', $kode);
-        if (!empty($nama)) $data_search = $data_search->where('nama', 'LIKE', '%' . $nama . '%');
-        if (!empty($hargamin)) $data_search = $data_search->where('harga_beli', '>=', $hargamin)->where('harga_beli', '<=', $hargamax);
+    if (!empty($kode)) $data_search = $data_search->where('kode', $kode);
+    if (!empty($nama)) $data_search = $data_search->where('nama', 'LIKE', '%' . $nama . '%');
+    if (!empty($hargamin)) $data_search = $data_search->whereBetween('harga_beli', [$hargamin, $hargamax]);
 
-        $data_search = $data_search->select('kode', 'nama', 'jenis', 'harga_beli', 'laba', 'supplier')->orderBy('id')->get();
+    $data_search = $data_search->orderBy('id')->get()->map(function($item) {
+        return [
+            'kode' => $item->kode,
+            'nama' => $item->nama,
+            'kategori' => $item->kategoriItems->pluck('nama')->join(', '), // gabungkan nama kategori jadi string
+            'foto' => $item->foto,
+            'jenis' => $item->jenis,
+            'harga_beli' => $item->harga_beli,
+            'laba' => $item->laba,
+            'supplier' => $item->supplier,
+        ];
+    });
 
-
-        return json_encode([
-            'status' => 200,
-            'data' => $data_search
-        ]);
-    }
+    return response()->json([
+        'status' => 200,
+        'data' => $data_search
+    ]);
+}
 
     public function formView($method, $id = 0)
     {
@@ -65,12 +76,14 @@ class MasterItemsController extends Controller
             $data_item = MasterItem::find($id);
             $kode = $data_item->kode;
         }
-        if ($request->hasFile('foto')) {
-            $file = $request->file('foto');
-            dd($file);
-        } else {
-            dd('File foto tidak ditemukan');
-        }
+//         if ($request->hasFile('foto')) {
+//     $file = $request->file('foto');
+//     $filename = time() . '.' . $file->getClientOriginalExtension();
+//     $file->move(public_path('uploads'), $filename);
+
+//     $data_item->foto = 'uploads/' . $filename;
+// }
+
 
         $data_item->nama = $request->nama;
         if ($request->has('kategori_items')) {
