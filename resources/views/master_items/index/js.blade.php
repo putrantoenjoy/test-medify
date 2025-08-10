@@ -40,20 +40,23 @@
                 var data = results.data
 
                 $.each(data, function(index, item) {
-                    var harga_jual = Math.round(item.harga_beli + item.harga_beli * item.laba / 100);
-                    var html = `<a href="{{url('master-items/view/')}}/` + item.kode + `" class="btn btn-primary">View</a>`;
+                    var harga_jual = item.harga_beli + item.harga_beli * item.laba / 100;
+                    harga_jual = Math.round(harga_jual);
 
-                    // Render foto sebagai img tag
                     var fotoHtml = '';
                     if (item.foto) {
-                        fotoHtml = `<img src="{{ asset('') }}${item.foto}" alt="Foto" style="max-width:100px; max-height:80px;">`;
+                        fotoHtml = '<img src="' + item.foto + '" width="100" alt="Foto Item" />';
+                    } else {
+                        fotoHtml = 'No Image';
                     }
 
-                    var row = [
+                    var html = `<a href="{{url('master-items/view/')}}/` + item.kode + `" class="btn btn-primary">View</a>`;
+
+                    var array_temp = [
                         item.kode,
                         item.nama,
-                        item.kategori,  // kategori string sudah digabung di server
-                        fotoHtml,       // tampilkan foto
+                        item.kategori,
+                        fotoHtml,
                         item.jenis,
                         item.harga_beli,
                         harga_jual,
@@ -61,8 +64,9 @@
                         html
                     ];
 
-                    dataTableObj.row.add(row).draw(true);
+                    dataTableObj.row.add(array_temp).draw(true);
                 });
+
 
                 $('#loading-filter').hide();
             },
