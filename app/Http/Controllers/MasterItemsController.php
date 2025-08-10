@@ -37,14 +37,15 @@ class MasterItemsController extends Controller
     public function formView($method, $id = 0)
     {
         if ($method == 'new') {
-            $item = [];
+            $item = new MasterItem(); // buat objek kosong agar bisa diakses properti dan relasinya
         } else {
-            $item = MasterItem::find($id);
+            $item = MasterItem::with('kategoriItems')->findOrFail($id); // pastikan relasi kategoriItems diload
         }
         $data['item'] = $item;
         $data['method'] = $method;
         return view('master_items.form.index', $data);
     }
+
 
     public function singleView($kode)
     {
@@ -64,8 +65,20 @@ class MasterItemsController extends Controller
             $data_item = MasterItem::find($id);
             $kode = $data_item->kode;
         }
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            dd($file);
+        } else {
+            dd('File foto tidak ditemukan');
+        }
 
         $data_item->nama = $request->nama;
+        if ($request->has('kategori_items')) {
+            $data_item->kategoriItems()->sync($request->kategori_items);
+        } else {
+            $data_item->kategoriItems()->sync([]);
+        }
+
         $data_item->harga_beli = $request->harga_beli;
         $data_item->laba = $request->laba;
         $data_item->kode = $kode;

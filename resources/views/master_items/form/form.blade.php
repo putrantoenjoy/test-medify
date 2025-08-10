@@ -1,4 +1,4 @@
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     @csrf
     @if($method == 'edit')
     <div class="form-group">
@@ -10,6 +10,21 @@
     <div class="form-group">
         <label>Nama</label>
         <input type="text" class="form-control" name="nama" required  value="{{$item->nama ?? ''}}">
+    </div>
+
+    @php
+        $selectedKategori = old('kategori_items', $item->kategoriItems->pluck('id')->toArray() ?? []);
+    @endphp
+
+    <div class="form-group">
+        <label>Kategori</label>
+        <select name="kategori_items[]" multiple class="form-control">
+            @foreach(\App\Models\KategoriItem::all() as $kategori)
+                <option value="{{ $kategori->id }}" @if(in_array($kategori->id, $selectedKategori)) selected @endif>
+                    {{ $kategori->nama }}
+                </option>
+            @endforeach
+        </select>
     </div>
 
     <div class="form-group">
@@ -46,6 +61,13 @@
             <optio @if($selected == 'Umum') selected @endif>Umum</option>
             <optio @if($selected == 'ATK') selected @endif>ATK</option>
         </select>
+    </div>
+    <div class="form-group">
+        <label>Foto</label>
+        <div>
+            <input type="file" name="foto">
+        </div>
+
     </div>
 
     <button class="btn btn-primary mt-3">Submit</button>
