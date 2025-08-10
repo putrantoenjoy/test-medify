@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('master_items', function (Blueprint $table) {
             $table->id();
             $table->string('kode');
+            $table->string('foto')->nullable(); 
             $table->string('nama');
             $table->integer('harga_beli');
             $table->integer('laba');

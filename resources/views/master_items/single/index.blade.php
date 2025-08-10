@@ -38,9 +38,12 @@
                             <td>{{$data->supplier}}</td>
                         </tr>
                         <tr>
-                            <th>Jenis</th>
+                            <th>Jeni</th>
                             <td>:</td>
                             <td>{{$data->jenis}}</td>
+                        </tr>
+                        <tr>
+                            <input type="file" name="foto">
                         </tr>
                     </table>
                     <a class="btn btn-info" href="{{url('master-items/form/edit')}}/{{$data->id}}">Edit</a>

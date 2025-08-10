@@ -71,6 +71,13 @@ class MasterItemsController extends Controller
         $data_item->kode = $kode;
         $data_item->supplier = $request->supplier;
         $data_item->jenis = $request->jenis;
+        if ($request->hasFile('foto')) {
+            $foto = $request->file('foto');
+            $namaFoto = time() . '.' . $foto->getClientOriginalExtension();
+            $foto->move(public_path('uploads'), $namaFoto);
+
+            $data_item->foto = 'uploads/' . $namaFoto; // Simpan path foto
+        }
         $data_item->save();
 
         return redirect('master-items');
